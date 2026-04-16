@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Aulas{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+  <h2 class="text-2xl font-semibold">Aulas</h2>
+  {% if perms.core.add_aula %}<a href="{% url 'aula_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded">Nova aula</a>{% endif %}
+</div>
+<form method="get" class="mb-4 flex gap-2">
+  <input name="disciplina" value="{{ request.GET.disciplina }}" placeholder="ID disciplina" class="border p-2 rounded w-40">
+  <input type="date" name="data" value="{{ request.GET.data }}" class="border p-2 rounded">
+  <button class="bg-gray-200 px-3 rounded">Filtrar</button>
+</form>
+<div class="bg-white rounded shadow overflow-hidden">
+  <table class="w-full text-left">
+    <thead class="bg-gray-100"><tr><th class="p-3">Disciplina</th><th class="p-3">Sala</th><th class="p-3">Data</th><th class="p-3">Horário</th><th class="p-3">Ações</th></tr></thead>
+    <tbody>
+    {% for a in object_list %}
+      <tr class="border-t">
+        <td class="p-3">{{ a.disciplina.codigo }} — {{ a.disciplina.nome }}</td>
+        <td class="p-3">{{ a.sala }}</td>
+        <td class="p-3">{{ a.data }}</td>
+        <td class="p-3">{{ a.horario_inicio }}–{{ a.horario_fim }}</td>
+        <td class="p-3">
+          <a href="{% url 'aula_detail' a.pk %}" class="text-blue-600">ver</a>
+          {% if perms.core.change_aula %} · <a href="{% url 'aula_update' a.pk %}" class="text-blue-600">editar</a>{% endif %}
+          {% if perms.core.change_aula %} · <a href="{% url 'aula_imprimir' a.pk %}" class="text-green-700">QR</a>{% endif %}
+          {% if perms.core.delete_aula %} · <a href="{% url 'aula_delete' a.pk %}" class="text-red-600">excluir</a>{% endif %}
+        </td>
+      </tr>
+    {% empty %}<tr><td colspan="5" class="p-3 text-gray-500">Nenhuma aula.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include 'core/_pagination.html' %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white p-6 rounded shadow max-w-xl">
+  <h2 class="text-2xl font-semibold mb-4">{{ object.predio }} — {{ object.nome }}</h2>
+  <dl class="grid grid-cols-2 gap-3">
+    <dt class="font-medium">Latitude</dt><dd>{{ object.latitude }}</dd>
+    <dt class="font-medium">Longitude</dt><dd>{{ object.longitude }}</dd>
+    <dt class="font-medium">Raio permitido</dt><dd>{{ object.raio_permitido }} m</dd>
+  </dl>
+  <div class="mt-4"><a href="{% url 'sala_list' %}" class="text-blue-600">← Voltar</a></div>
+</div>
+{% endblock %}

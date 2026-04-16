@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ title|default:'Formulário' }}{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded shadow max-w-2xl">
+  <h2 class="text-2xl font-semibold mb-4">{{ title|default:'Formulário' }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}<p class="text-xs text-red-600 mt-1">{{ field.errors|join:', ' }}</p>{% endif %}
+      </div>
+    {% endfor %}
+    <div class="flex gap-2">
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Salvar</button>
+      <a href="{{ cancel_url|default:'..' }}" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Cancelar</a>
+    </div>
+  </form>
+</div>
+<style>
+  input[type=text], input[type=email], input[type=number], input[type=date], input[type=time],
+  input[type=password], select, textarea {
+    width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;
+  }
+</style>
+{% endblock %}

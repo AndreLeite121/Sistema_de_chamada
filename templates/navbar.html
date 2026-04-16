@@ -1,11 +1,24 @@
 <nav class="bg-white shadow">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold text-blue-600">Meu Projeto</h1>
+  <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-blue-600"><a href="/">Sistema de Frequência</a></h1>
 
-        <ul class="flex space-x-6">
-            <li><a href="/" class="text-gray-700 hover:text-blue-600">Home</a></li>
-            <li><a href="#" class="text-gray-700 hover:text-blue-600">Sobre</a></li>
-            <li><a href="#" class="text-gray-700 hover:text-blue-600">Contato</a></li>
-        </ul>
-    </div>
+    <ul class="flex space-x-4 items-center text-sm">
+      <li><a href="/" class="text-gray-700 hover:text-blue-600">Home</a></li>
+      {% if user.is_authenticated %}
+        <li><a href="{% url 'dashboard' %}" class="text-gray-700 hover:text-blue-600">Dashboard</a></li>
+        {% if perms.core.view_aula %}<li><a href="{% url 'aula_list' %}" class="text-gray-700 hover:text-blue-600">Aulas</a></li>{% endif %}
+        {% if perms.core.view_disciplina %}<li><a href="{% url 'disciplina_list' %}" class="text-gray-700 hover:text-blue-600">Disciplinas</a></li>{% endif %}
+        {% if perms.core.view_presenca %}<li><a href="{% url 'presenca_list' %}" class="text-gray-700 hover:text-blue-600">Presenças</a></li>{% endif %}
+        {% if perms.core.view_aluno %}<li><a href="{% url 'aluno_list' %}" class="text-gray-700 hover:text-blue-600">Alunos</a></li>{% endif %}
+        {% if perms.core.view_professor %}<li><a href="{% url 'professor_list' %}" class="text-gray-700 hover:text-blue-600">Professores</a></li>{% endif %}
+        {% if perms.core.view_sala %}<li><a href="{% url 'sala_list' %}" class="text-gray-700 hover:text-blue-600">Salas</a></li>{% endif %}
+        {% if user.is_staff %}<li><a href="{% url 'auditoria' %}" class="text-gray-700 hover:text-blue-600">Auditoria</a></li>{% endif %}
+        {% if user.is_staff %}<li><a href="/admin/" class="text-gray-700 hover:text-blue-600">Admin</a></li>{% endif %}
+        <li class="text-gray-500">| {{ user.email }}</li>
+        <li><a href="{% url 'account_logout' %}" class="text-red-600 hover:underline">Sair</a></li>
+      {% else %}
+        <li><a href="{% url 'account_login' %}" class="text-blue-600 hover:underline">Entrar</a></li>
+      {% endif %}
+    </ul>
+  </div>
 </nav>

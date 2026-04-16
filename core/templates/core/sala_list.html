@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Salas{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+  <h2 class="text-2xl font-semibold">Salas</h2>
+  {% if perms.core.add_sala %}<a href="{% url 'sala_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded">Nova sala</a>{% endif %}
+</div>
+<div class="bg-white rounded shadow overflow-hidden">
+  <table class="w-full text-left">
+    <thead class="bg-gray-100"><tr><th class="p-3">Prédio</th><th class="p-3">Nome</th><th class="p-3">Lat/Long</th><th class="p-3">Raio (m)</th><th class="p-3">Ações</th></tr></thead>
+    <tbody>
+    {% for s in object_list %}
+      <tr class="border-t">
+        <td class="p-3">{{ s.predio }}</td>
+        <td class="p-3">{{ s.nome }}</td>
+        <td class="p-3">{{ s.latitude }}, {{ s.longitude }}</td>
+        <td class="p-3">{{ s.raio_permitido }}</td>
+        <td class="p-3">
+          <a href="{% url 'sala_detail' s.pk %}" class="text-blue-600">ver</a>
+          {% if perms.core.change_sala %} · <a href="{% url 'sala_update' s.pk %}" class="text-blue-600">editar</a>{% endif %}
+          {% if perms.core.delete_sala %} · <a href="{% url 'sala_delete' s.pk %}" class="text-red-600">excluir</a>{% endif %}
+        </td>
+      </tr>
+    {% empty %}<tr><td colspan="5" class="p-3 text-gray-500">Nenhuma sala.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include 'core/_pagination.html' %}
+{% endblock %}

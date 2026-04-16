@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Registrar Presença{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
+  {% if erro %}
+    <h2 class="text-2xl font-semibold text-red-700 mb-3">Erro</h2>
+    <p>{{ erro }}</p>
+  {% else %}
+    <h2 class="text-2xl font-semibold mb-4">Registrar Presença</h2>
+    <div class="mb-4 text-gray-700">
+      <p><strong>{{ aula.disciplina.codigo }}</strong> — {{ aula.disciplina.nome }}</p>
+      <p>Sala: {{ aula.sala }}</p>
+      <p>Data: {{ aula.data|date:"d/m/Y" }} · {{ aula.horario_inicio|time:"H:i" }}–{{ aula.horario_fim|time:"H:i" }}</p>
+    </div>
+
+    <div id="status" class="mb-4 text-gray-600">Aguardando sua permissão de localização…</div>
+
+    <button id="btn-registrar" disabled
+      class="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+      Registrar Presença
+    </button>
+
+    <div id="mensagem" class="mt-4"></div>
+
+    {% csrf_token %}
+    {{ token|json_script:"token-data" }}
+    <script>
+      (function(){
+        const status = document.getElementById('status');
+        const btn = document.getElementById('btn-registrar');
+        const msg = document.getElementById('mensagem');
+        const aulaId = {{ aula.pk }};
+        let coords = null;
+
+        if (!navigator.geolocation) {
+          status.textContent = 'Seu navegador não suporta geolocalização.';
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            status.innerHTML = 'Localização capturada: <code>' + coords.lat.toFixed(5) + ', ' + coords.lng.toFixed(5) + '</code>';
+            btn.disabled = false;
+          },
+          (err) => {
+            status.textContent = 'Não foi possível obter localização: ' + err.message;
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+
+        btn.addEventListener('click', async () => {
+          btn.disabled = true;
+          msg.innerHTML = '<span class="text-gray-500">Enviando…</span>';
+          const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+          const tokenValue = JSON.parse(document.getElementById('token-data').textContent);
+          const form = new FormData();
+          form.append('aula_id', aulaId);
+          form.append('token', tokenValue);
+          form.append('latitude', coords.lat);
+          form.append('longitude', coords.lng);
+          try {
+            const resp = await fetch('', {
+              method: 'POST',
+              headers: { 'X-CSRFToken': csrf },
+              body: form,
+            });
+            const data = await resp.json();
+            if (data.ok) {
+              msg.innerHTML = '<div class="p-3 bg-green-100 text-green-800 rounded">' + data.mensagem + '</div>';
+            } else {
+              msg.innerHTML = '<div class="p-3 bg-red-100 text-red-800 rounded">' + data.mensagem + '</div>';
+              btn.disabled = false;
+            }
+          } catch (e) {
+            msg.innerHTML = '<div class="p-3 bg-red-100 text-red-800 rounded">Erro de rede: ' + e.message + '</div>';
+            btn.disabled = false;
+          }
+        });
+      })();
+    </script>
+  {% endif %}
+</div>
+{% endblock %}

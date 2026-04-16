@@ -10,7 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +27,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-oze!e-vly@-8hhan@fq19%-45o6*7a2w@av-d8#hwx9##%xf44'
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-oze!e-vly@-8hhan@fq19%-45o6*7a2w@av-d8#hwx9##%xf44',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
 
 
 # Application definition
@@ -43,6 +53,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'accounts',
     'home',
+    'core',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -86,12 +97,25 @@ WSGI_APPLICATION = 'cursodjango.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DB_ENGINE = os.environ.get('DB_ENGINE', 'sqlite3')
+if DB_ENGINE == 'postgresql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DB_NAME', 'sistema_freq'),
+            'USER': os.environ.get('DB_USER', 'postgres'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'PORT': os.environ.get('DB_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -120,7 +144,7 @@ LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'America/Sao_Paulo'
 
-USE_I18N = True
+USE_I18N = False
 
 USE_TZ = True
 
@@ -129,6 +153,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# URL base usada na geração de QR Codes (aponta para o endpoint de presença)
+SITE_URL = os.environ.get('SITE_URL', 'http://localhost:8000')
+
+# Ranges de IP da rede institucional (CIDR separados por vírgula).
+# Em dev, permite localhost + redes privadas típicas.
+UNIVERSITY_IP_RANGES = [
+    cidr.strip()
+    for cidr in os.environ.get(
+        'UNIVERSITY_IP_RANGES',
+        '127.0.0.0/8,::1/128,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12',
+    ).split(',')
+    if cidr.strip()
+]
 
 # ====================================
 # DJANGO ALLAUTH SETTINGS

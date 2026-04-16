@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white p-6 rounded shadow max-w-xl">
+  <h2 class="text-2xl font-semibold mb-4">Presença #{{ object.pk }}</h2>
+  <dl class="grid grid-cols-2 gap-3">
+    <dt class="font-medium">Aluno</dt><dd>{{ object.aluno }}</dd>
+    <dt class="font-medium">Aula</dt><dd>{{ object.aula }}</dd>
+    <dt class="font-medium">Registrado em</dt><dd>{{ object.horario_registro|date:'d/m/Y H:i' }}</dd>
+    <dt class="font-medium">Status</dt><dd>{{ object.get_status_display }}</dd>
+    <dt class="font-medium">IP</dt><dd>{{ object.ip_registrado|default:'-' }}</dd>
+    <dt class="font-medium">Localização</dt><dd>{{ object.latitude|default:'-' }}, {{ object.longitude|default:'-' }}</dd>
+  </dl>
+  <div class="mt-4"><a href="{% url 'presenca_list' %}" class="text-blue-600">← Voltar</a></div>
+</div>
+{% endblock %}

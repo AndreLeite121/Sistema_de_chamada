@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Histórico de Alterações{% endblock %}
+{% block content %}
+<h2 class="text-2xl font-semibold mb-4">Histórico de Alterações</h2>
+
+<form method="get" class="mb-4 flex flex-wrap gap-2">
+  <input name="usuario" value="{{ request.GET.usuario }}" placeholder="ID usuário" class="border p-2 rounded w-32">
+  <select name="acao" class="border p-2 rounded">
+    <option value="">Todas ações</option>
+    <option value="1" {% if request.GET.acao == '1' %}selected{% endif %}>Criar</option>
+    <option value="2" {% if request.GET.acao == '2' %}selected{% endif %}>Alterar</option>
+    <option value="3" {% if request.GET.acao == '3' %}selected{% endif %}>Excluir</option>
+  </select>
+  <input name="modelo" value="{{ request.GET.modelo }}" placeholder="modelo (ex.: aula)" class="border p-2 rounded w-40">
+  <input type="date" name="desde" value="{{ request.GET.desde }}" class="border p-2 rounded">
+  <input type="date" name="ate" value="{{ request.GET.ate }}" class="border p-2 rounded">
+  <button class="bg-gray-200 px-3 rounded">Filtrar</button>
+</form>
+
+<div class="bg-white rounded shadow overflow-hidden">
+  <table class="w-full text-left text-sm">
+    <thead class="bg-gray-100">
+      <tr><th class="p-3">Quando</th><th class="p-3">Usuário</th><th class="p-3">Ação</th><th class="p-3">Modelo</th><th class="p-3">Objeto</th><th class="p-3">Mensagem</th></tr>
+    </thead>
+    <tbody>
+    {% for e in object_list %}
+      <tr class="border-t">
+        <td class="p-3 whitespace-nowrap">{{ e.action_time|date:"d/m/Y H:i:s" }}</td>
+        <td class="p-3">{{ e.user|default:'-' }}</td>
+        <td class="p-3">
+          {% if e.action_flag == 1 %}<span class="px-2 py-1 bg-green-100 text-green-800 rounded">Criar</span>
+          {% elif e.action_flag == 2 %}<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">Alterar</span>
+          {% else %}<span class="px-2 py-1 bg-red-100 text-red-800 rounded">Excluir</span>{% endif %}
+        </td>
+        <td class="p-3">{{ e.content_type.model|default:'-' }}</td>
+        <td class="p-3">{{ e.object_repr|truncatechars:60 }}</td>
+        <td class="p-3 text-gray-600">{{ e.change_message|default:'-'|truncatechars:60 }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="p-3 text-gray-500">Sem registros.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include 'core/_pagination.html' %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white p-6 rounded shadow max-w-2xl">
+  <h2 class="text-2xl font-semibold mb-4">Aula — {{ object.disciplina.codigo }}</h2>
+  <dl class="grid grid-cols-2 gap-3">
+    <dt class="font-medium">Disciplina</dt><dd>{{ object.disciplina }}</dd>
+    <dt class="font-medium">Sala</dt><dd>{{ object.sala }}</dd>
+    <dt class="font-medium">Data</dt><dd>{{ object.data }}</dd>
+    <dt class="font-medium">Horário</dt><dd>{{ object.horario_inicio }} – {{ object.horario_fim }}</dd>
+    <dt class="font-medium">Token QR</dt><dd><code class="text-xs">{{ object.token_qrcode }}</code></dd>
+  </dl>
+  <div class="mt-4 flex gap-3">
+    <a href="{% url 'aula_list' %}" class="text-blue-600">← Voltar</a>
+    {% if perms.core.change_aula %}<a href="{% url 'aula_imprimir' object.pk %}" class="bg-green-700 text-white px-3 py-1 rounded">🖨 Gerar QR Code</a>{% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Presenças{% endblock %}
+{% block content %}
+<h2 class="text-2xl font-semibold mb-4">Presenças</h2>
+<form method="get" class="mb-4 flex gap-2">
+  <input name="aluno" value="{{ request.GET.aluno }}" placeholder="ID aluno" class="border p-2 rounded w-32">
+  <input name="disciplina" value="{{ request.GET.disciplina }}" placeholder="ID disciplina" class="border p-2 rounded w-32">
+  <input type="date" name="data" value="{{ request.GET.data }}" class="border p-2 rounded">
+  <button class="bg-gray-200 px-3 rounded">Filtrar</button>
+</form>
+<div class="bg-white rounded shadow overflow-hidden">
+  <table class="w-full text-left">
+    <thead class="bg-gray-100"><tr><th class="p-3">Aluno</th><th class="p-3">Aula</th><th class="p-3">Registrado em</th><th class="p-3">Status</th><th class="p-3">IP</th><th class="p-3">Ações</th></tr></thead>
+    <tbody>
+    {% for p in object_list %}
+      <tr class="border-t">
+        <td class="p-3">{{ p.aluno.matricula }} - {{ p.aluno.nome }}</td>
+        <td class="p-3">{{ p.aula.disciplina.codigo }} {{ p.aula.data }}</td>
+        <td class="p-3">{{ p.horario_registro|date:'d/m/Y H:i' }}</td>
+        <td class="p-3">{{ p.get_status_display }}</td>
+        <td class="p-3">{{ p.ip_registrado|default:'-' }}</td>
+        <td class="p-3">
+          <a href="{% url 'presenca_detail' p.pk %}" class="text-blue-600">ver</a>
+          {% if perms.core.change_presenca %} · <a href="{% url 'presenca_update' p.pk %}" class="text-blue-600">editar</a>{% endif %}
+          {% if perms.core.delete_presenca %} · <a href="{% url 'presenca_delete' p.pk %}" class="text-red-600">excluir</a>{% endif %}
+        </td>
+      </tr>
+    {% empty %}<tr><td colspan="6" class="p-3 text-gray-500">Nenhuma presença registrada.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include 'core/_pagination.html' %}
+{% endblock %}

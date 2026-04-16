@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Professores{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+  <h2 class="text-2xl font-semibold">Professores</h2>
+  {% if perms.core.add_professor %}<a href="{% url 'professor_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded">Novo professor</a>{% endif %}
+</div>
+<form method="get" class="mb-4"><input name="q" value="{{ request.GET.q }}" placeholder="Buscar nome" class="border p-2 rounded w-80"></form>
+<div class="bg-white rounded shadow overflow-hidden">
+  <table class="w-full text-left">
+    <thead class="bg-gray-100"><tr><th class="p-3">Nome</th><th class="p-3">E-mail</th><th class="p-3">Departamento</th><th class="p-3">Ações</th></tr></thead>
+    <tbody>
+    {% for p in object_list %}
+      <tr class="border-t">
+        <td class="p-3">{{ p.nome }}</td>
+        <td class="p-3">{{ p.email }}</td>
+        <td class="p-3">{{ p.departamento }}</td>
+        <td class="p-3">
+          <a href="{% url 'professor_detail' p.pk %}" class="text-blue-600">ver</a>
+          {% if perms.core.change_professor %} · <a href="{% url 'professor_update' p.pk %}" class="text-blue-600">editar</a>{% endif %}
+          {% if perms.core.delete_professor %} · <a href="{% url 'professor_delete' p.pk %}" class="text-red-600">excluir</a>{% endif %}
+        </td>
+      </tr>
+    {% empty %}<tr><td colspan="4" class="p-3 text-gray-500">Nenhum professor cadastrado.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include 'core/_pagination.html' %}
+{% endblock %}
