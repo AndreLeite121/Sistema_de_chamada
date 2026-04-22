@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load core_extras %}
 {% block title %}Aulas{% endblock %}
 {% block content %}
 <div class="flex justify-between items-center mb-4">
@@ -6,7 +7,7 @@
   {% if perms.core.add_aula %}<a href="{% url 'aula_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded">Nova aula</a>{% endif %}
 </div>
 <form method="get" class="mb-4 flex gap-2">
-  <input name="disciplina" value="{{ request.GET.disciplina }}" placeholder="ID disciplina" class="border p-2 rounded w-40">
+  <input name="disciplina" value="{{ request.GET.disciplina }}" placeholder="Nome ou código da disciplina" class="border p-2 rounded w-72" autocomplete="off">
   <input type="date" name="data" value="{{ request.GET.data }}" class="border p-2 rounded">
   <button class="bg-gray-200 px-3 rounded">Filtrar</button>
 </form>
@@ -15,10 +16,16 @@
     <thead class="bg-gray-100"><tr><th class="p-3">Disciplina</th><th class="p-3">Sala</th><th class="p-3">Data</th><th class="p-3">Horário</th><th class="p-3">Ações</th></tr></thead>
     <tbody>
     {% for a in object_list %}
+      {% with feriado_nome=a.data|feriado %}
       <tr class="border-t">
         <td class="p-3">{{ a.disciplina.codigo }} — {{ a.disciplina.nome }}</td>
         <td class="p-3">{{ a.sala }}</td>
-        <td class="p-3">{{ a.data }}</td>
+        <td class="p-3">
+          {{ a.data }}
+          {% if feriado_nome %}
+            <span title="Feriado: {{ feriado_nome }}" class="text-yellow-600 ml-1 cursor-help" aria-label="Feriado: {{ feriado_nome }}">▲</span>
+          {% endif %}
+        </td>
         <td class="p-3">{{ a.horario_inicio }}–{{ a.horario_fim }}</td>
         <td class="p-3">
           <a href="{% url 'aula_detail' a.pk %}" class="text-blue-600">ver</a>
@@ -27,6 +34,7 @@
           {% if perms.core.delete_aula %} · <a href="{% url 'aula_delete' a.pk %}" class="text-red-600">excluir</a>{% endif %}
         </td>
       </tr>
+      {% endwith %}
     {% empty %}<tr><td colspan="5" class="p-3 text-gray-500">Nenhuma aula.</td></tr>{% endfor %}
     </tbody>
   </table>

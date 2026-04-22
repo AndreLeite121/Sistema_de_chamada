@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load core_extras %}
 {% block content %}
 <div class="bg-white p-6 rounded shadow max-w-2xl">
   <h2 class="text-2xl font-semibold mb-4">{{ object.codigo }} - {{ object.nome }}</h2>
@@ -9,7 +10,16 @@
   </dl>
   <h3 class="font-semibold mt-4">Aulas</h3>
   <ul class="list-disc pl-5">
-    {% for aula in object.aulas.all %}<li>{{ aula.data }} {{ aula.horario_inicio }}–{{ aula.horario_fim }} / {{ aula.sala }}</li>{% empty %}<li class="text-gray-500">Sem aulas cadastradas.</li>{% endfor %}
+    {% for aula in object.aulas.all %}
+      {% with feriado_nome=aula.data|feriado %}
+        <li>
+          {{ aula.data }} {{ aula.horario_inicio }}–{{ aula.horario_fim }} / {{ aula.sala }}
+          {% if feriado_nome %}
+            <span title="Feriado: {{ feriado_nome }}" class="text-yellow-600 cursor-help" aria-label="Feriado: {{ feriado_nome }}">▲</span>
+          {% endif %}
+        </li>
+      {% endwith %}
+    {% empty %}<li class="text-gray-500">Sem aulas cadastradas.</li>{% endfor %}
   </ul>
   <div class="mt-4"><a href="{% url 'disciplina_list' %}" class="text-blue-600">← Voltar</a></div>
 </div>

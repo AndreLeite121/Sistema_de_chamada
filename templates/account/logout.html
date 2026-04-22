@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Sair{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10">
+  <div class="bg-white shadow rounded-lg p-8 text-center">
+    <h2 class="text-xl font-semibold text-gray-800 mb-2">Confirmar saída</h2>
+    <p class="text-sm text-gray-600 mb-6">Tem certeza que deseja encerrar a sessão?</p>
+
+    <form method="post" action="{% url 'account_logout' %}" class="flex gap-3 justify-center">
+      {% csrf_token %}
+      {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+      {% endif %}
+      <a href="/" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-5 rounded transition">
+        Cancelar
+      </a>
+      <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-5 rounded transition">
+        Sair
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

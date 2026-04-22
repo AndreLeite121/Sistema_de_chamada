@@ -3,7 +3,6 @@
     <h1 class="text-xl font-bold text-blue-600"><a href="/">Sistema de Frequência</a></h1>
 
     <ul class="flex space-x-4 items-center text-sm">
-      <li><a href="/" class="text-gray-700 hover:text-blue-600">Home</a></li>
       {% if user.is_authenticated %}
         <li><a href="{% url 'dashboard' %}" class="text-gray-700 hover:text-blue-600">Dashboard</a></li>
         {% if perms.core.view_aula %}<li><a href="{% url 'aula_list' %}" class="text-gray-700 hover:text-blue-600">Aulas</a></li>{% endif %}

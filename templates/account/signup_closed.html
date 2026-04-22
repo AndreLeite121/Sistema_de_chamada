@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastro indisponível{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10">
+  <div class="bg-white shadow rounded-lg p-8 text-center">
+    <div class="mx-auto mb-4 w-14 h-14 rounded-full bg-yellow-100 flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+      </svg>
+    </div>
+    <h2 class="text-xl font-semibold text-gray-800 mb-2">Cadastro público indisponível</h2>
+    <p class="text-sm text-gray-600 mb-6">
+      Novas contas são criadas apenas pela administração do sistema.
+      Procure um professor ou administrador para ser cadastrado.
+    </p>
+    <a href="{% url 'account_login' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded transition">
+      Voltar para o login
+    </a>
+  </div>
+</div>
+{% endblock %}

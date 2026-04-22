@@ -188,6 +188,8 @@ ACCOUNT_RATE_LIMITS = {
 
 ACCOUNT_SESSION_REMEMBER = True
 
+ACCOUNT_ADAPTER = 'accounts.adapter.NoSignupAdapter'
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 #import os

@@ -20,11 +20,11 @@ from .models import Aluno, Aula, Disciplina, Presenca, Professor, Sala
 
 
 def log_action(user, obj, flag, message=''):
-    LogEntry.objects.log_action(
+    LogEntry.objects.create(
         user_id=user.pk,
         content_type_id=ContentType.objects.get_for_model(obj).pk,
         object_id=obj.pk,
-        object_repr=str(obj),
+        object_repr=str(obj)[:200],
         action_flag=flag,
         change_message=message or '',
     )
@@ -248,9 +248,12 @@ class AulaList(LoginRequiredMixin, StrictPermissionRequiredMixin, ListView):
             qs = qs.filter(disciplina__professor__user=user)
         elif _is_aluno(user) and not user.is_staff:
             qs = qs.filter(disciplina__alunos__user=user)
-        disc = self.request.GET.get('disciplina')
-        if disc and disc.isdigit():
-            qs = qs.filter(disciplina_id=disc)
+        disc = (self.request.GET.get('disciplina') or '').strip()
+        if disc:
+            qs = qs.filter(
+                Q(disciplina__nome__icontains=disc)
+                | Q(disciplina__codigo__icontains=disc)
+            )
         data = self.request.GET.get('data')
         if data:
             qs = qs.filter(data=data)
