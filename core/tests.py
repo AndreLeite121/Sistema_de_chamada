@@ -26,7 +26,6 @@ class IpInRangesTests(TestCase):
         self.assertFalse(ip_in_ranges('not-an-ip', ['127.0.0.0/8']))
 
     def test_invalid_cidr_ignored(self):
-        # CIDR inválido é ignorado, válido ainda testado
         self.assertTrue(ip_in_ranges('10.0.0.1', ['bogus', '10.0.0.0/8']))
 
 
@@ -35,11 +34,11 @@ class HaversineTests(TestCase):
         self.assertAlmostEqual(haversine_m(0, 0, 0, 0), 0)
 
     def test_1_degree_latitude_about_111km(self):
-        # 1 grau de latitude ≈ 111 km
+        # 1 grau de latitude ~= 111 km
         d = haversine_m(0, 0, 1, 0)
         self.assertAlmostEqual(d, 111195, delta=100)
 
     def test_short_distance_meters(self):
-        # Dois pontos a ~50m de distância (lat diff ~0.00045 ≈ 50m)
+        # lat diff ~0.00045 ~= 50m
         d = haversine_m(-18.123, -45.456, -18.123 + 0.00045, -45.456)
         self.assertAlmostEqual(d, 50, delta=3)

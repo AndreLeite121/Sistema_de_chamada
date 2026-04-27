@@ -1,9 +1,8 @@
-"""Cálculo de feriados nacionais brasileiros (federais fixos e móveis)."""
 from datetime import date, timedelta
 
 
 def pascoa(ano):
-    """Calcula o domingo de Páscoa pelo algoritmo de Computus (método de Meeus/Jones/Butcher)."""
+    # Computus, metodo de Meeus/Jones/Butcher
     a = ano % 19
     b = ano // 100
     c = ano % 100
@@ -22,7 +21,6 @@ def pascoa(ano):
 
 
 def feriados_br(ano):
-    """Retorna dict {date: nome} com os principais feriados nacionais do ano."""
     easter = pascoa(ano)
     return {
         date(ano, 1, 1): 'Confraternização Universal',
@@ -42,7 +40,6 @@ def feriados_br(ano):
 
 
 def nome_feriado(d):
-    """Retorna o nome do feriado se `d` for feriado, senão None."""
     if not d:
         return None
     return feriados_br(d.year).get(d)

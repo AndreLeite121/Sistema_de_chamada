@@ -7,12 +7,6 @@ from .models import Aluno, Aula, Disciplina, Presenca, Professor, Sala
 
 
 def _sync_user_account(instancia, email, senha, grupo_nome):
-    """Cria/atualiza o User vinculado, garante grupo e EmailAddress verificado.
-
-    - Se a instância já tem user, atualiza email/senha desse user.
-    - Se não tem, cria um novo User com email como username.
-    - Senha só é trocada quando `senha` vem preenchida.
-    """
     User = get_user_model()
 
     if instancia.user_id:

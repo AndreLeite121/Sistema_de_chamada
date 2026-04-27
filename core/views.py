@@ -31,7 +31,6 @@ def log_action(user, obj, flag, message=''):
 
 
 class StrictPermissionRequiredMixin(PermissionRequiredMixin):
-    """Retorna 403 em vez de redirecionar quando permissão negada (AC9)."""
     raise_exception = True
 
 
@@ -64,7 +63,6 @@ def _is_aluno(user):
     return user.groups.filter(name='Alunos').exists()
 
 
-# ========== ALUNO ==========
 class AlunoList(LoginRequiredMixin, StrictPermissionRequiredMixin, ListView):
     model = Aluno
     permission_required = 'core.view_aluno'
@@ -103,7 +101,6 @@ class AlunoDelete(AuditedDeleteView):
     success_url = reverse_lazy('aluno_list')
 
 
-# ========== PROFESSOR ==========
 class ProfessorList(LoginRequiredMixin, StrictPermissionRequiredMixin, ListView):
     model = Professor
     permission_required = 'core.view_professor'
@@ -142,7 +139,6 @@ class ProfessorDelete(AuditedDeleteView):
     success_url = reverse_lazy('professor_list')
 
 
-# ========== DISCIPLINA ==========
 class DisciplinaList(LoginRequiredMixin, StrictPermissionRequiredMixin, ListView):
     model = Disciplina
     permission_required = 'core.view_disciplina'
@@ -203,7 +199,6 @@ class DisciplinaDelete(UserPassesTestMixin, AuditedDeleteView):
         return hasattr(u, 'professor') and obj.professor_id == u.professor.pk
 
 
-# ========== SALA ==========
 class SalaList(LoginRequiredMixin, StrictPermissionRequiredMixin, ListView):
     model = Sala
     permission_required = 'core.view_sala'
@@ -235,7 +230,6 @@ class SalaDelete(AuditedDeleteView):
     success_url = reverse_lazy('sala_list')
 
 
-# ========== AULA ==========
 class AulaList(LoginRequiredMixin, StrictPermissionRequiredMixin, ListView):
     model = Aula
     permission_required = 'core.view_aula'
@@ -299,7 +293,6 @@ class AulaDelete(UserPassesTestMixin, AuditedDeleteView):
         return hasattr(u, 'professor') and obj.disciplina.professor_id == u.professor.pk
 
 
-# ========== PRESENCA ==========
 class PresencaList(LoginRequiredMixin, StrictPermissionRequiredMixin, ListView):
     model = Presenca
     permission_required = 'core.view_presenca'
@@ -330,7 +323,6 @@ class PresencaDetail(LoginRequiredMixin, StrictPermissionRequiredMixin, DetailVi
 
 
 class PresencaUpdate(UserPassesTestMixin, AuditedUpdateView):
-    """Somente professor da aula ou admin pode editar presença."""
     model = Presenca
     form_class = PresencaForm
     permission_required = 'core.change_presenca'
@@ -357,9 +349,6 @@ class PresencaDelete(UserPassesTestMixin, AuditedDeleteView):
         return hasattr(u, 'professor') and obj.aula.disciplina.professor_id == u.professor.pk
 
 
-
-
-# ========== QR CODE ==========
 def _user_can_manage_aula(user, aula):
     if user.is_staff:
         return True
@@ -404,7 +393,6 @@ def aula_regenerar_token(request, pk):
     return redirect('aula_imprimir', pk=aula.pk)
 
 
-# ========== REGISTRO DE PRESENCA ==========
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -419,7 +407,7 @@ def _get_aluno_for_user(user):
 
 
 def _validate_presenca(user, aula, token, latitude, longitude, client_ip):
-    """Retorna (ok, status_code, mensagem). Ordem: auth → token → horário → duplicidade → IP → geo."""
+    # Ordem fixa: auth -> token -> horario -> duplicidade -> IP -> geo
     aluno = _get_aluno_for_user(user)
     if aluno is None:
         return False, 403, 'Apenas alunos podem registrar presença.'
@@ -459,7 +447,6 @@ def presenca_view(request):
     token = request.GET.get('token') or request.POST.get('token')
 
     if not request.user.is_authenticated:
-        # Allauth redireciona para login e volta aqui via `next`
         from django.contrib.auth.views import redirect_to_login
         return redirect_to_login(request.get_full_path())
 
@@ -476,7 +463,6 @@ def presenca_view(request):
             'token': token,
         })
 
-    # POST → valida e registra
     latitude = request.POST.get('latitude')
     longitude = request.POST.get('longitude')
     client_ip = get_client_ip(request)
@@ -503,7 +489,6 @@ def presenca_view(request):
     })
 
 
-# ========== DASHBOARD + AUDITORIA ==========
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
 from django.utils.dateparse import parse_date

@@ -41,11 +41,17 @@ psql -U postgres -c "CREATE DATABASE sistema_freq;"
 > **Alternativa rápida em dev:** deixe `DB_ENGINE=sqlite3` no `.env`
 > para não precisar de PostgreSQL.
 
-### 4. Aplicar migrations e criar superusuário
+### 4. Aplicar migrations e criar dados de demonstração
 ```bash
 python manage.py migrate
-python manage.py createsuperuser
+python manage.py seed_demo
 ```
+
+`seed_demo` cria os grupos, três usuários de teste, uma disciplina, sala e
+duas aulas (uma "em andamento" para testar o fluxo de presença).
+
+> Para criar um superuser próprio em vez do demo, use
+> `python manage.py createsuperuser`.
 
 ### 5. Rodar
 ```bash
@@ -53,6 +59,23 @@ python manage.py runserver
 ```
 
 Acesse http://localhost:8000.
+
+## Usuários de teste (após `seed_demo`)
+
+Login é feito por **e-mail** em `/accounts/login/`.
+
+| Papel        | Email                  | Senha          |
+|--------------|------------------------|----------------|
+| Administrador | `admin@demo.local`     | `admin123`     |
+| Professor    | `professor@demo.local` | `professor123` |
+| Aluno        | `aluno@demo.local`     | `aluno123`     |
+
+Cada um cai em um dashboard diferente conforme o papel:
+- **Admin** vê totais, auditoria e CRUD completo.
+- **Professor** vê suas disciplinas, próximas aulas e últimas presenças.
+- **Aluno** vê suas disciplinas, próxima aula e percentual de frequência.
+
+> Senhas são apenas para demonstração local — **não** use em produção.
 
 ## Papéis (Groups)
 
@@ -63,7 +86,9 @@ O sistema cria automaticamente 3 grupos (via data migration):
 
 Adicione usuários aos grupos pelo admin do Django (`/admin/`).
 Para Professores e Alunos, também crie um registro em
-`core.Professor` ou `core.Aluno` ligado ao User.
+`core.Professor` ou `core.Aluno` ligado ao User
+(ou use os formulários internos de `/core/alunos/novo/` e
+`/core/professores/novo/`, que já criam o User vinculado).
 
 ## Fluxo de presença
 

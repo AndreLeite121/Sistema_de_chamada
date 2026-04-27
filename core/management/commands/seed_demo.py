@@ -15,7 +15,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         User = get_user_model()
 
-        # --- Usuários ---
         admin, _ = User.objects.get_or_create(
             username='admin',
             defaults={'email': 'admin@demo.local', 'is_staff': True, 'is_superuser': True},
@@ -54,11 +53,9 @@ class Command(BaseCommand):
             defaults={'verified': True, 'primary': True},
         )
 
-        # --- Groups ---
         prof_user.groups.add(Group.objects.get(name='Professores'))
         aluno_user.groups.add(Group.objects.get(name='Alunos'))
 
-        # --- Entidades de domínio ---
         professor, _ = Professor.objects.update_or_create(
             email='professor@demo.local',
             defaults={
@@ -92,14 +89,13 @@ class Command(BaseCommand):
             predio='ICET',
             nome='Lab 1',
             defaults={
-                # Coordenadas de UFVJM (Diamantina/MG) — ajuste para testar localmente
+                # UFVJM (Diamantina/MG) - ajuste para testar localmente
                 'latitude': -18.2478,
                 'longitude': -43.6031,
                 'raio_permitido': 100,
             },
         )
 
-        # --- Aulas: uma agora (para testar presença) + próximas ---
         hoje = timezone.localdate()
         agora = timezone.localtime().time()
         inicio = time(max(agora.hour - 1, 0), 0)
