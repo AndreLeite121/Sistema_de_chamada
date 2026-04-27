@@ -8,40 +8,36 @@ registro de presença validado, dashboard e histórico.
 
 ## Stack
 
-- Python 3.12 · Django 6 · django-allauth
-- PostgreSQL (produção) · SQLite (dev, opcional)
+- Python 3.10+ · Django 5.2 · django-allauth
+- SQLite (default em dev) · PostgreSQL (opcional)
 - `qrcode[pil]` para geração de QR
 - Tailwind (CDN) + JS vanilla no frontend
 
-## Setup (Linux / macOS)
+## Setup rápido (Linux / macOS) — 5 passos com SQLite
+
+Esse é o caminho recomendado para avaliar o projeto: **não precisa instalar
+PostgreSQL nem configurar banco**. O SQLite vem embutido no Python.
 
 ### 1. Clonar e criar virtualenv
 ```bash
-git clone <repo>
-cd SistemaOpr
+git clone https://github.com/AndreLeite121/Sistema_de_chamada.git
+cd Sistema_de_chamada
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Configurar variáveis de ambiente
+### 2. Copiar o arquivo de ambiente
 ```bash
 cp .env.example .env
-# edite .env com os valores reais (banco, SECRET_KEY etc.)
 ```
 
-### 3. Subir o PostgreSQL e criar o banco
-```bash
-# instale o PostgreSQL localmente, depois:
-createdb sistema_freq
-# ou via psql:
-psql -U postgres -c "CREATE DATABASE sistema_freq;"
-```
+> **Nota:** `.env` é arquivo oculto (começa com `.`). Para confirmar que ele
+> foi criado, use `ls -a`. Para abrir e editar, `nano .env` ou `code .env`.
+> Por padrão ele já vem configurado para SQLite — não precisa mudar nada
+> para o setup rápido.
 
-> **Alternativa rápida em dev:** deixe `DB_ENGINE=sqlite3` no `.env`
-> para não precisar de PostgreSQL.
-
-### 4. Aplicar migrations e criar dados de demonstração
+### 3. Aplicar migrations e popular dados de demonstração
 ```bash
 python manage.py migrate
 python manage.py seed_demo
@@ -53,12 +49,64 @@ duas aulas (uma "em andamento" para testar o fluxo de presença).
 > Para criar um superuser próprio em vez do demo, use
 > `python manage.py createsuperuser`.
 
-### 5. Rodar
+### 4. Rodar
 ```bash
 python manage.py runserver
 ```
 
-Acesse http://localhost:8000.
+Acesse http://localhost:8000 e faça login com um dos usuários abaixo.
+
+---
+
+## Setup com PostgreSQL (opcional)
+
+Use este caminho apenas se quiser rodar o projeto contra PostgreSQL real.
+Faça os passos 1 e 2 do setup rápido normalmente, depois:
+
+### 1. Instalar PostgreSQL
+```bash
+# Ubuntu / Debian
+sudo apt update
+sudo apt install postgresql postgresql-client
+sudo service postgresql start
+
+# macOS (Homebrew)
+brew install postgresql@16
+brew services start postgresql@16
+```
+
+### 2. Criar usuário com senha e o banco
+```bash
+sudo -u postgres psql
+```
+Dentro do `psql`:
+```sql
+ALTER USER postgres WITH PASSWORD 'postgres';
+CREATE DATABASE sistema_freq;
+\q
+```
+
+### 3. Apontar o `.env` para PostgreSQL
+Abra `.env` (`nano .env`) e troque o bloco de banco para:
+```env
+DB_ENGINE=postgresql
+DB_NAME=sistema_freq
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=127.0.0.1
+DB_PORT=5432
+```
+
+> **Dica:** prefira `127.0.0.1` a `localhost`. Em alguns sistemas Linux
+> `localhost` força autenticação `peer` (via socket Unix) e ignora a senha,
+> o que costuma confundir o erro.
+
+### 4. Aplicar migrations e seguir
+```bash
+python manage.py migrate
+python manage.py seed_demo
+python manage.py runserver
+```
 
 ## Usuários de teste (após `seed_demo`)
 
@@ -112,11 +160,27 @@ python manage.py check           # sanidade do projeto
 python manage.py createsuperuser
 ```
 
+## Solução de problemas comuns
+
+- **`pip install` falha em `Django==X`**: confirme que o `requirements.txt`
+  está fixado em `Django==5.2.7`. Versões 6.x ainda não foram lançadas.
+- **`No module named 'django'`**: você esqueceu de ativar o venv. Rode
+  `source venv/bin/activate` antes de qualquer `python manage.py …`.
+- **`.env` não aparece no `ls`**: arquivos com `.` no início são ocultos.
+  Use `ls -a`.
+- **(PostgreSQL) `password authentication failed for user "postgres"`**:
+  a senha do usuário `postgres` no seu PostgreSQL não bate com a do `.env`.
+  Veja o passo 2 do "Setup com PostgreSQL".
+- **(PostgreSQL) `database "sistema_freq" does not exist`**: o banco não
+  foi criado. Refaça `CREATE DATABASE sistema_freq;` dentro do `psql`.
+- **Login "não acontece nada"**: o login é por **e-mail**, não username.
+  Use `admin@demo.local` em vez de `admin`.
+
 ## Observações
 
-- `USE_I18N=False` — workaround para bug de .mo corrompido em Django 6 (pt).
-  Não afeta as labels dos modelos (já em PT no código).
-- Auditoria usa `django.contrib.admin.models.LogEntry` (nativo).
+- `USE_I18N=False` é definido em `settings.py` para evitar dependência de
+  arquivos `.mo` de tradução. As labels dos modelos já estão em PT no código.
+- Auditoria usa `django.contrib.admin.models.LogEntry` (nativo do Django).
   Visível em `/core/auditoria/` (staff) e `/admin/admin/logentry/`.
 
 ## Roadmap
