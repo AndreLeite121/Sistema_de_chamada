@@ -1,5 +1,16 @@
 # Sistema de Controle de Frequência por QR Code
 
+Trabalho da disciplina de **Sistemas Distribuídos**
+Prof. Alessandro Vivas Andrade
+
+**Integrantes:**
+- André Leite
+- André Alexandre
+- Lavínia Charrua
+- Iasmin Torres
+
+---
+
 Sistema distribuído (em construção) para controle de presença em sala de aula
 usando QR Code, com validação de rede institucional, geolocalização e autenticação.
 
